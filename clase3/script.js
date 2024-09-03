@@ -30,32 +30,37 @@ const main = () => {
   //]
 
 
-  let vertices = new Float32Array(200);
+
+  let vertices = new Float32Array(400);
+
+  for (let i = 0; i < 400; i++) {
+    vertices[i] = Math.random() * 2 - 1;
+  }
   // linea 1
-  let a = Math.random() * 2 - 1;
-  vertices[0] = a;
+  //let a = Math.random() * 2 - 1;
+  //vertices[0] = a;
 
-  a = Math.random() * 2 - 1;
-  vertices[1] = a;
+  //a = Math.random() * 2 - 1;
+  //vertices[1] = a;
 
-  a = Math.random() * 2 - 1;
-  vertices[2] = a;
+  //a = Math.random() * 2 - 1;
+  //vertices[2] = a;
 
-  a = Math.random() * 2 - 1;
-  vertices[3] = a;
-  // linea 2
+  //a = Math.random() * 2 - 1;
+  //vertices[3] = a;
+  //// linea 2
 
-  a = Math.random() * 2 - 1;
-  vertices[4] = a;
+  //a = Math.random() * 2 - 1;
+  //vertices[4] = a;
 
-  a = Math.random() * 2 - 1;
-  vertices[5] = a;
+  //a = Math.random() * 2 - 1;
+  //vertices[5] = a;
 
-  a = Math.random() * 2 - 1;
-  vertices[6] = a;
+  //a = Math.random() * 2 - 1;
+  //vertices[6] = a;
 
-  a = Math.random() * 2 - 1;
-  vertices[7] = a;
+  //a = Math.random() * 2 - 1;
+  //vertices[7] = a;
 
 
   let lineasVAO = gl.createVertexArray();
@@ -63,7 +68,6 @@ const main = () => {
 
   let codigoVertices = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, codigoVertices);
-  //gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
   gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
   gl.enableVertexAttribArray(0);
   gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
@@ -78,19 +82,28 @@ const main = () => {
 
   gl.bindVertexArray(lineasVAO);
 
-  let r = Math.random();
-  let g = Math.random();
-  let b = Math.random();
+  for (let i = 0; i < 100; i++) {
+    let r = Math.random();
+    let g = Math.random();
+    let b = Math.random();
 
-  gl.uniform4f(uColor, r, g, b, 1);
-  gl.drawArrays(gl.LINES, 0, 2);
+    gl.uniform4f(uColor, r, g, b, 1);
+    gl.drawArrays(gl.LINES, i * 2, 2);
+  }
 
-  r = Math.random();
-  g = Math.random();
-  b = Math.random();
+  //let r = Math.random();
+  //let g = Math.random();
+  //let b = Math.random();
 
-  gl.uniform4f(uColor, r, g, b, 1);
-  gl.drawArrays(gl.LINES, 2, 2);
+  //gl.uniform4f(uColor, r, g, b, 1);
+  //gl.drawArrays(gl.LINES, 0, 2);
+
+  //r = Math.random();
+  //g = Math.random();
+  //b = Math.random();
+
+  //gl.uniform4f(uColor, r, g, b, 1);
+  //gl.drawArrays(gl.LINES, 2, 2);
 
   gl.bindVertexArray(null);
 
