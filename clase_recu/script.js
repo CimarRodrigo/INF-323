@@ -21,24 +21,13 @@ const main = () => {
   gl.useProgram(programaID);
 
   let vertices = [
-    //trueangulo 1
-    -0.15, -0.25,
-    0, -0.5,
-    0.15, -0.25,
-    0.44, -0.25,
-    0.29, 0,
-    0.44, 0.27,
-    0.15, 0.27,
+    -0.5, -0.5,
+    0.5, -0.5,
     0, 0.5,
-    -0.15, 0.27,
-    -0.44, 0.27,
-    -0.29, 0,
-    -0.44, -0.25,
-
   ]
 
-  let trianguloVAO = gl.createVertexArray();
-  gl.bindVertexArray(trianguloVAO);
+  let puntosVAO = gl.createVertexArray();
+  gl.bindVertexArray(puntosVAO);
 
   let codigoVertices = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, codigoVertices);
@@ -54,16 +43,11 @@ const main = () => {
   gl.clearColor(0, 0, 0, 1);
   gl.clear(gl.COLOR_BUFFER_BIT);
 
-  gl.bindVertexArray(trianguloVAO);
+  gl.bindVertexArray(puntosVAO);
 
   gl.uniform4f(uColor, 1, 0, 0, 1);
-  gl.drawArrays(gl.TRIANGLE_FAN, 0, 12);
+  gl.drawArrays(gl.POINTS, 0, 3);
 
-  //gl.uniform4f(uColor, 0, 1, 0, 1);
-  //gl.drawArrays(gl.TRIANGLES, 3, 3);
-
-  //gl.uniform4f(uColor, 0, 0, 1, 1);
-  //gl.drawArrays(gl.LINES, 4, 2);
 
 
   gl.bindVertexArray(null);
