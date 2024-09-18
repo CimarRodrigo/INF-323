@@ -69,20 +69,16 @@ const main = () => {
   gl.bindVertexArray(null);
   gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
-  let uColor = gl.getUniformLocation(programaID, "vColores");
 
   gl.clearColor(0, 0, 0, 1);
   gl.clear(gl.COLOR_BUFFER_BIT);
 
   gl.bindVertexArray(trianguloVAO);
 
-  gl.uniform4f(uColor, 1, 0, 0, 1);
   gl.drawArrays(gl.TRIANGLES, 0, 3);
 
-  gl.uniform4f(uColor, 0, 1, 0, 1);
   gl.drawArrays(gl.TRIANGLES, 3, 3);
 
-  gl.uniform4f(uColor, 0, 0, 1, 1);
   gl.drawArrays(gl.TRIANGLES, 6, 3);
 
   gl.bindVertexArray(null);

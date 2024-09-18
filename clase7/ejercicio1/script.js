@@ -1,5 +1,31 @@
 import { identidad, ortho, traslacion } from './matriz.js';
 
+
+const canvas = document.getElementById("canvas");
+
+const estaDentro = (posX, posY, x, y, ancho, alto) => {
+  if (posX > x && posX < x + ancho && posY > y && posY < y + alto) {
+    return true;
+  }
+  return false;
+}
+const mouseDown = (event) => {
+  let x = event.clientX;
+  let y = event.clientY;
+  x = x - canvas.offsetLeft;
+  y = y - canvas.offsetTop;
+  //alert(`x: ${x}, y: ${y}`);
+  // transoforma a coordenadas de webgl2
+  //x = (x - canvas.width / 2) / (canvas.width / 2);
+  //y = (canvas.height / 2 - y) / (canvas.height / 2);
+  x = x * 20 / canvas.clientWidth - 10;
+  y = (1 - y / canvas.clientHeight) * 20 - 10;
+
+  if (estaDentro(x, y, -1, -1, 2, 2)) {
+    alert("Dentro del cuadrado");
+  }
+}
+
 const main = () => {
   let uMatrizProyeccion;
   let uMatrizModelo;
@@ -9,9 +35,9 @@ const main = () => {
   let MatrizModelo = new Array(16);
   let MatrizVista = new Array(16);
 
-  const canvas = document.getElementById("canvas");
   let gl = canvas.getContext("webgl2");
   gl.viewport(0, 0, canvas.width, canvas.height);
+  canvas.addEventListener("mousedown", mouseDown, false);
 
   let shaderVertice = gl.createShader(gl.VERTEX_SHADER);
   gl.shaderSource(shaderVertice, document.getElementById("vs").text.trim());
@@ -35,8 +61,9 @@ const main = () => {
   uMatrizVista = gl.getUniformLocation(programaID, "uMatrizVista");
 
   identidad(MatrizProyeccion);
-  ortho(MatrizProyeccion, -5, 5, -5, 5, -1, 1);
+  ortho(MatrizProyeccion, -10, 10, -10, 10, -1, 1);
   gl.uniformMatrix4fv(uMatrizProyeccion, false, MatrizProyeccion);
+
 
 
   identidad(MatrizVista);
@@ -46,13 +73,15 @@ const main = () => {
     //trueangulo 1
     -1, -1,
     1, -1,
-    0, 1,
+    1, 1,
+    -1, 1
   ]
 
   let colores = [
     1, 0, 0, 1,
-    0, 1, 0, 1,
-    0, 0, 1, 1,
+    1, 0, 0, 1,
+    1, 0, 0, 1,
+    1, 0, 0, 1,
   ]
 
   let trianguloVAO = gl.createVertexArray();
@@ -73,33 +102,19 @@ const main = () => {
   gl.bindVertexArray(null);
   gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
-  let uColor = gl.getUniformLocation(programaID, "vColores");
 
   gl.clearColor(0, 0, 0, 1);
   gl.clear(gl.COLOR_BUFFER_BIT);
 
-  identidad(MatrizModelo);
-  traslacion(MatrizModelo, 1, 1, 0);
-  gl.uniformMatrix4fv(uMatrizModelo, false, MatrizModelo);
-
 
   // Dibujar
   identidad(MatrizModelo);
-  traslacion(MatrizModelo, 2, 1, 0);
   gl.uniformMatrix4fv(uMatrizModelo, false, MatrizModelo);
 
   gl.bindVertexArray(trianguloVAO);
-  gl.uniform4f(uColor, 1, 0, 0, 1);
-  gl.drawArrays(gl.TRIANGLES, 0, 3);
+  gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
 
 
-  // Dibujar
-  identidad(MatrizModelo);
-  traslacion(MatrizModelo, -2, 1, 0);
-  gl.uniformMatrix4fv(uMatrizModelo, false, MatrizModelo);
-
-  gl.uniform4f(uColor, 1, 0, 0, 1);
-  gl.drawArrays(gl.TRIANGLES, 0, 3);
 
   gl.bindVertexArray(null);
 
