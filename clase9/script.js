@@ -1,4 +1,4 @@
-import { identidad, ortho, traslacion, escalacion, rotacionZ } from './matriz.js';
+import { identidad, ortho, traslacion, escalacion, rotacionZ, rotacionX } from './matriz.js';
 
 let uMatrizProyeccion;
 let uMatrizModelo;
@@ -14,14 +14,15 @@ let gl = canvas.getContext("webgl2");
 let trianguloVAO;
 
 const dibujar = () => {
+  gl.clearColor(0, 0, 0, 1);
+  gl.clear(gl.COLOR_BUFFER_BIT);
 
   identidad(MatrizModelo);
   //traslacion(MatrizModelo, 2, 1, 0);
-  escalacion(MatrizModelo, 3, 1, 0);
+  //escalacion(MatrizModelo, 3, 1, 0);
+  rotacionX(MatrizModelo, 80);
   gl.uniformMatrix4fv(uMatrizModelo, false, MatrizModelo);
 
-  gl.clearColor(0, 0, 0, 1);
-  gl.clear(gl.COLOR_BUFFER_BIT);
 
   gl.bindVertexArray(trianguloVAO);
 

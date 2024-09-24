@@ -29,7 +29,7 @@ export const escalacion = (matriz, sx, sy, sz) => {
 }
 
 /* RotaciÃ³n sobre X - glRotatef */
-const rotacionX = (matriz, theta) => {
+export const rotacionX = (matriz, theta) => {
   let r = new Array(16);
   var c = Math.cos(toRadians(theta));
   var s = Math.sin(toRadians(theta));
