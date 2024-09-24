@@ -1,5 +1,4 @@
-import { identidad, ortho } from './matriz.js';
-
+import { identidad, ortho } from "./matriz.js";
 const canvas = document.getElementById("canvas");
 let gl = canvas.getContext("webgl2");
 
@@ -13,6 +12,8 @@ let MatrizVista = new Array(16);
 let uColor;
 let sw = 0;
 
+let trianguloVAO = gl.createVertexArray();
+gl.bindVertexArray(trianguloVAO);
 let vertices = [
   //trueangulo 1
   -1, -1,
@@ -56,8 +57,34 @@ const mouseDown = (event) => {
 
   if (estaDentro(x, y, -1, -1, 2, 2)) {
     alert("Dentro del cuadrado");
-    main();
+    dibuja();
   }
+}
+
+const dibuja = () => {
+  gl.clearColor(0, 0, 0, 1);
+  gl.clear(gl.COLOR_BUFFER_BIT);
+  gl.bindVertexArray(trianguloVAO);
+
+  identidad(MatrizModelo);
+  gl.uniformMatrix4fv(uMatrizModelo, false, MatrizModelo);
+
+  if (sw === 0) {
+    cambiarANaranja();
+    gl.uniform4f(uColor, colores[0], colores[1], colores[2], colores[3]);
+    sw = 1;
+  }
+
+  else {
+    cambiarAVerde();
+    gl.uniform4f(uColor, colores[0], colores[1], colores[2], colores[3]);
+    sw = 0;
+  }
+
+
+  gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
+
+  gl.bindVertexArray(null);
 }
 
 const main = () => {
@@ -95,8 +122,6 @@ const main = () => {
   identidad(MatrizVista);
   gl.uniformMatrix4fv(uMatrizVista, false, MatrizVista);
 
-  let trianguloVAO = gl.createVertexArray();
-  gl.bindVertexArray(trianguloVAO);
 
   let codigoVertices = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, codigoVertices);
@@ -115,22 +140,7 @@ const main = () => {
 
   uColor = gl.getUniformLocation(programaID, "uColor");
 
-  if (sw === 0) {
-    cambiarANaranja();
-    identidad(MatrizModelo);
-    gl.uniformMatrix4fv(uMatrizModelo, false, MatrizModelo);
-    gl.uniform4f(uColor, colores[0], colores[1], colores[2], colores[3]);
-    gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
-    sw = 1;
-  }
-  else {
-    cambiarAVerde();
-    identidad(MatrizModelo);
-    gl.uniformMatrix4fv(uMatrizModelo, false, MatrizModelo);
-    gl.uniform4f(uColor, colores[0], colores[1], colores[2], colores[3]);
-    gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
-    sw = 0;
-  }
+  dibuja();
 
 
   gl.bindVertexArray(null);

@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>3 en Raya con WebGL</title>
+    <style>
+      body { 
+        margin: 0; 
+        display: flex; 
+        flex-direction: column; 
+        align-items: center; 
+        justify-content: center; 
+        height: 100vh; 
+        background-color: #000; 
+      }
+      canvas { 
+        border: 1px solid #fff; 
+      }
+      #reiniciar { 
+        margin-bottom: 20px; 
+        padding: 10px 20px; 
+        font-size: 16px; 
+        cursor: pointer; 
+      }
+    </style>
+  </head>
+  <body>
+
+    <button id="reiniciar">Reiniciar Juego</button>
+    <canvas id="canvas" width="600" height="600"></canvas>
+
+    <script id="vs-lineas" type="vertex">
+      #version 300 es
+      precision mediump float;
+      uniform mat4 uMatrizProyeccion;
+      uniform mat4 uMatrizVista;
+      uniform mat4 uMatrizModelo;
+      layout(location = 0) in vec2 aVertices;
+      void main() {
+        gl_Position = uMatrizProyeccion * uMatrizVista * uMatrizModelo * vec4(aVertices, 0.0, 1.0);
+      }
+    </script>
+    <script id="fs-lineas" type="fragment">
+      #version 300 es
+      precision mediump float;
+      uniform vec4 uColor;
+      out vec4 fragColor;
+      void main() {
+        fragColor = uColor; // Blanco para líneas
+      }
+    </script>
+
+    <script id="vs-marcas" type="vertex">
+      #version 300 es
+      precision mediump float;
+      uniform mat4 uMatrizProyeccion;
+      uniform mat4 uMatrizVista;
+      uniform mat4 uMatrizModelo;
+      layout(location = 0) in vec2 aPos;
+      void main() {
+        gl_Position = uMatrizProyeccion * uMatrizVista * uMatrizModelo * vec4(aPos, 0.0, 1.0);
+      }
+    </script>
+    <script id="fs-marcas" type="fragment">
+      #version 300 es
+      precision mediump float;
+      uniform vec4 uColor;
+      out vec4 fragColor;
+      void main() {
+        fragColor = uColor;
+      }
+    </script>
+
+    <script>
+      const identidad = (r) => {
+        r[0] = 1; r[4] = 0; r[8] = 0; r[12] = 0;
+        r[1] = 0; r[5] = 1; r[9] = 0; r[13] = 0;
+        r[2] = 0; r[6] = 0; r[10] = 1; r[14] = 0;
+        r[3] = 0; r[7] = 0; r[11] = 0; r[15] = 1;
+      }
+
+      const ortho = (r, izq, der, abj, arr, cerca, lejos) => {
+        r[0] = 2 / (der - izq); r[4] = 0; r[8] = 0; r[12] = -(der + izq) / (der - izq);
+        r[1] = 0; r[5] = 2 / (arr - abj); r[9] = 0; r[13] = -(arr + abj) / (arr - abj);
+        r[2] = 0; r[6] = 0; r[10] = -2 / (lejos - cerca); r[14] = -(lejos + cerca) / (lejos - cerca);
+        r[3] = 0; r[7] = 0; r[11] = 0; r[15] = 1;
+      }
+
+      const canvas = document.getElementById("canvas");
+      const gl = canvas.getContext("webgl2");
+      const TAM_CELDA = 6.666; 
+      let tablero = [
+        ['', '', ''],
+        ['', '', ''],
+        ['', '', '']
+      ];
+      let jugadorActual = 'X';
+      let terminado = false;
+
+      const crearProgram = (gl, vsSource, fsSource) => {
+        const vertexShader = gl.createShader(gl.VERTEX_SHADER);
+        gl.shaderSource(vertexShader, vsSource);
+        gl.compileShader(vertexShader);
+
+        const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
+        gl.shaderSource(fragmentShader, fsSource);
+        gl.compileShader(fragmentShader);
+
+        const shaderProgram = gl.createProgram();
+        gl.attachShader(shaderProgram, vertexShader);
+        gl.attachShader(shaderProgram, fragmentShader);
+        gl.linkProgram(shaderProgram);
+
+        return shaderProgram;
+      }
+
+      const vsSourceLineas = document.getElementById("vs-lineas").text.trim();
+      const fsSourceLineas = document.getElementById("fs-lineas").text.trim();
+      const programaLineas = crearProgram(gl, vsSourceLineas, fsSourceLineas);
+
+      const vsSourceMarcas = document.getElementById("vs-marcas").text.trim();
+      const fsSourceMarcas = document.getElementById("fs-marcas").text.trim();
+      const programaMarcas = crearProgram(gl, vsSourceMarcas, fsSourceMarcas);
+
+      const MatrizProyeccion = new Float32Array(16);
+      const MatrizVista = new Float32Array(16);
+      const MatrizModelo = new Float32Array(16);
+      identidad(MatrizProyeccion);
+      ortho(MatrizProyeccion, -10, 10, -10, 10, -1, 1);
+      identidad(MatrizVista);
+      identidad(MatrizModelo);
+
+      const lineasVAO = gl.createVertexArray();
+      gl.bindVertexArray(lineasVAO);
+
+      const lineas = [
+        // Verticales
+        -3.333, -10,
+        -3.333, 10,
+        3.333, -10,
+        3.333, 10,
+        // Horizontales
+        -10, -3.333,
+        10, -3.333,
+        -10, 3.333,
+        10, 3.333
+      ];
+
+      const bufferLineas = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, bufferLineas);
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(lineas), gl.STATIC_DRAW);
+      gl.enableVertexAttribArray(0);
+      gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
+
+      gl.bindVertexArray(null);
+      gl.bindBuffer(gl.ARRAY_BUFFER, null);
+
+      const marcasVAO = gl.createVertexArray();
+      gl.bindVertexArray(marcasVAO);
+
+      const bufferMarcas = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, bufferMarcas);
+      gl.enableVertexAttribArray(0);
+      gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
+
+      gl.bindVertexArray(null);
+      gl.bindBuffer(gl.ARRAY_BUFFER, null);
+
+      function verificarGanador(jugador) {
+        for (let i = 0; i < 3; i++) {
+          if (tablero[i][0] === jugador && tablero[i][1] === jugador && tablero[i][2] === jugador) return true;
+          if (tablero[0][i] === jugador && tablero[1][i] === jugador && tablero[2][i] === jugador) return true;
+        }
+        if (tablero[0][0] === jugador && tablero[1][1] === jugador && tablero[2][2] === jugador) return true;
+        if (tablero[0][2] === jugador && tablero[1][1] === jugador && tablero[2][0] === jugador) return true;
+        return false;
+      }
+
+      function dibujarMarcas() {
+        gl.useProgram(programaMarcas);
+
+        const locProy = gl.getUniformLocation(programaMarcas, "uMatrizProyeccion");
+        const locVista = gl.getUniformLocation(programaMarcas, "uMatrizVista");
+        const locModelo = gl.getUniformLocation(programaMarcas, "uMatrizModelo");
+        const locColor = gl.getUniformLocation(programaMarcas, "uColor");
+
+        gl.uniformMatrix4fv(locProy, false, MatrizProyeccion);
+        gl.uniformMatrix4fv(locVista, false, MatrizVista);
+        gl.uniformMatrix4fv(locModelo, false, MatrizModelo);
+
+        gl.bindVertexArray(marcasVAO);
+        gl.bindBuffer(gl.ARRAY_BUFFER, bufferMarcas);
+
+        tablero.forEach((fila, i) => {
+          fila.forEach((celda, j) => {
+            if (celda !== '') {
+              if (celda === 'X') {
+                // Dibujar una X
+                const size = TAM_CELDA / 2;
+                const centerX = -10 + TAM_CELDA * j + TAM_CELDA / 2;
+                const centerY = -10 + TAM_CELDA * i + TAM_CELDA / 2;
+                const verticesX = [
+                  centerX - size / 2, centerY - size / 2,
+                  centerX + size / 2, centerY + size / 2,
+                  centerX + size / 2, centerY - size / 2,
+                  centerX - size / 2, centerY + size / 2
+                ];
+
+                gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(verticesX), gl.STATIC_DRAW);
+                gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
+
+                gl.uniform4f(locColor, 1.0, 0.0, 0.0, 1.0); // Rojo
+                gl.drawArrays(gl.LINES, 0, 4);
+              } else if (celda === 'O') {
+                // Dibujar una O
+                const centerX = -10 + TAM_CELDA * j + TAM_CELDA / 2;
+                const centerY = -10 + TAM_CELDA * i + TAM_CELDA / 2;
+                const radio = TAM_CELDA / 3;
+                const segmentos = 100;
+                let verticesO = [];
+                for (let k = 0; k <= segmentos; k++) {
+                  let theta = (k / segmentos) * 2 * Math.PI;
+                  verticesO.push(centerX + radio * Math.cos(theta));
+                  verticesO.push(centerY + radio * Math.sin(theta));
+                }
+                gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(verticesO), gl.STATIC_DRAW);
+                gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
+
+                gl.uniform4f(locColor, 0.0, 0.0, 1.0, 1.0); // Azul
+                gl.drawArrays(gl.LINE_STRIP, 0, segmentos + 1);
+              }
+            }
+          });
+        });
+
+        gl.bindVertexArray(null);
+        gl.bindBuffer(gl.ARRAY_BUFFER, null);
+      }
+
+      // Función para dibujar las líneas del tablero
+      function dibujarLineas() {
+        gl.useProgram(programaLineas);
+
+        const locProy = gl.getUniformLocation(programaLineas, "uMatrizProyeccion");
+        const locVista = gl.getUniformLocation(programaLineas, "uMatrizVista");
+        const locModelo = gl.getUniformLocation(programaLineas, "uMatrizModelo");
+        const locColor = gl.getUniformLocation(programaLineas, "uColor");
+
+        gl.uniformMatrix4fv(locProy, false, MatrizProyeccion);
+        gl.uniformMatrix4fv(locVista, false, MatrizVista);
+        gl.uniformMatrix4fv(locModelo, false, MatrizModelo);
+
+        gl.uniform4f(locColor, 1.0, 1.0, 1.0, 1.0);
+
+        gl.bindVertexArray(lineasVAO);
+        gl.drawArrays(gl.LINES, 0, lineas.length / 2);
+        gl.bindVertexArray(null);
+      }
+
+      function dibuja() {
+        gl.clearColor(0, 0, 0, 1);
+        gl.clear(gl.COLOR_BUFFER_BIT);
+
+        dibujarMarcas();
+
+        dibujarLineas();
+      }
+
+      function mouseDown(event) {
+        if (terminado) return;
+
+        let rect = canvas.getBoundingClientRect();
+        let x = event.clientX - rect.left;
+        let y = event.clientY - rect.top;
+
+        // Convertir a coordenadas de WebGL
+        let glX = (x / canvas.width) * 20 - 10;
+        let glY = (1 - y / canvas.height) * 20 - 10;
+
+        let fila = Math.floor((glY + 10) / TAM_CELDA);
+        let columna = Math.floor((glX + 10) / TAM_CELDA);
+
+        fila = Math.max(0, Math.min(2, fila));
+        columna = Math.max(0, Math.min(2, columna));
+
+        if (tablero[fila][columna] === '') {
+          tablero[fila][columna] = jugadorActual;
+          dibuja();
+
+          if (verificarGanador(jugadorActual)) {
+            setTimeout(() => {
+              alert(`¡El jugador ${jugadorActual} ha ganado!`);
+              terminado = true;
+            }, 10);
+            return;
+          }
+
+          if (tablero.flat().every(celda => celda !== '')) {
+            setTimeout(() => {
+              alert("¡Es un empate!");
+              terminado = true;
+            }, 10);
+            return;
+          }
+
+          jugadorActual = jugadorActual === 'X' ? 'O' : 'X';
+        }
+      }
+
+      // Función para reiniciar el juego
+      function reiniciarJuego() {
+        tablero = [
+          ['', '', ''],
+          ['', '', ''],
+          ['', '', '']
+        ];
+        jugadorActual = 'X';
+        terminado = false;
+        dibuja();
+      }
+
+      function main() {
+        gl.viewport(0, 0, canvas.width, canvas.height);
+        dibuja();
+
+        canvas.addEventListener("mousedown", mouseDown, false);
+        document.getElementById("reiniciar").addEventListener("click", reiniciarJuego, false);
+      }
+
+      main();
+
+    </script>
+  </body>
+</html>

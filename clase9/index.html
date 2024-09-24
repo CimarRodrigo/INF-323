@@ -17,10 +17,7 @@
       uniform mat4 uMatrizModelo;
       precision mediump float;
       layout(location = 0) in vec2 aVertices;
-      layout(location = 1) in vec4 aColores;
-      out vec4 vColores;
       void main() {
-        vColores = aColores;
         gl_Position = uMatrizProyeccion * uMatrizVista * uMatrizModelo * vec4(aVertices, 0.0, 1.0);
       }
     </script>
