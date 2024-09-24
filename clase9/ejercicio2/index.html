@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title></title>
+    <link href="./style.css" rel="stylesheet">
+    <script type="module" src="./script.js" defer></script>
+  </head>
+  <body>
+
+    <canvas id="canvas"></canvas>
+    <script id = "vs" type = "vertex">
+      #version 300 es
+      uniform mat4 uMatrizProyeccion;
+      uniform mat4 uMatrizVista;
+      uniform mat4 uMatrizModelo;
+      precision mediump float;
+      layout(location = 0) in vec2 aVertices;
+      void main() {
+        gl_Position = uMatrizProyeccion * uMatrizVista * uMatrizModelo * vec4(aVertices, 0.0, 1.0);
+      }
+    </script>
+    <script id = "fs" type = "fragment">
+      #version 300 es
+      precision mediump float;
+      uniform vec4 uColor;
+      out vec4 color;
+      void main() {
+        color = uColor;
+      }
+    </script>
+  </body>
+</html>
