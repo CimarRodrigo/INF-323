@@ -12,6 +12,7 @@ let MatrizVista = new Array(16);
 const canvas = document.getElementById("canvas");
 let gl = canvas.getContext("webgl2");
 let trianguloVAO;
+let grados = 0;
 
 const dibujar = () => {
   gl.clearColor(0, 0, 0, 1);
@@ -20,7 +21,8 @@ const dibujar = () => {
   identidad(MatrizModelo);
   //traslacion(MatrizModelo, 2, 1, 0);
   //escalacion(MatrizModelo, 3, 1, 0);
-  rotacionX(MatrizModelo, 80);
+  rotacionX(MatrizModelo, grados);
+  rotacionZ(MatrizModelo, grados);
   gl.uniformMatrix4fv(uMatrizModelo, false, MatrizModelo);
 
 
@@ -29,6 +31,10 @@ const dibujar = () => {
   gl.uniform4f(uColor, 1, 0, 0, 1);
   gl.drawArrays(gl.TRIANGLES, 0, 3);
   gl.bindVertexArray(null);
+
+  grados += 1;
+
+  requestAnimationFrame(dibujar);
 }
 
 const main = () => {
