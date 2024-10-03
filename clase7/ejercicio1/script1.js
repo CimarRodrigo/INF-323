@@ -14,16 +14,16 @@ const mouseDown = (event) => {
   let y = event.clientY;
   x = x - canvas.offsetLeft;
   y = y - canvas.offsetTop;
-  //alert(`x: ${x}, y: ${y}`);
   // transoforma a coordenadas de webgl2
   //x = (x - canvas.width / 2) / (canvas.width / 2);
   //y = (canvas.height / 2 - y) / (canvas.height / 2);
   x = x * 20 / canvas.clientWidth - 10;
   y = (1 - y / canvas.clientHeight) * 20 - 10;
 
-  if (estaDentro(x, y, -1, -1, 2, 2)) {
-    alert("Dentro del cuadrado");
-  }
+  alert(`x: ${x}, y: ${y}`);
+  //if (estaDentro(x, y, -1, -1, 2, 2)) {
+  //alert("Dentro del cuadrado");
+  //}
 }
 
 const main = () => {
@@ -72,7 +72,7 @@ const main = () => {
   let vertices = [
     //trueangulo 1
     -1, -1,
-    1, -1,
+    2, -1,
     1, 1,
     -1, 1
   ]

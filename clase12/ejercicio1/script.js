@@ -13,7 +13,6 @@ const canvas = document.getElementById("canvas");
 let gl = canvas.getContext("webgl2");
 let rectanguloVAO;
 
-let radio1 = 1, radio2 = 1.5;
 
 let tx = 0, ty = 0;
 
@@ -62,10 +61,10 @@ const dibujar = () => {
   gl.uniformMatrix4fv(uMatrizModelo, false, MatrizModelo);
 
   gl.bindVertexArray(rectanguloVAO);
-  if (distanciaEntreDosPuntos(tx, ty, 2, 2) - radio1 - radio2 < 0) {
+  if (intersectan(tx, ty, 2, 2)) {
     gl.uniform4f(uColor, 1, 1, 0, 1);
   } else {
-    gl.uniform4f(uColor, 0, 1, 0, 1);
+    gl.uniform4f(uColor, 1, 0, 1, 1);
   }
   gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
   gl.bindVertexArray(null);
@@ -89,9 +88,28 @@ const keyDown = (event) => {
   dibujar();
 }
 
-const distanciaEntreDosPuntos = (x1, y1, x2, y2) => {
-  return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+const intersectan = (p1, p2, p3, p4) => {
+
+  let x1 = p1 - 1;
+  let x2 = p1 + 1;
+  let x3 = p3 - 1;
+  let x4 = p3 + 1;
+
+  let y1 = p2 - 1;
+  let y2 = p2 + 1;
+  let y3 = p4 - 1;
+  let y4 = p4 + 1;
+
+
+  if (x3 < x2 && x1 < x4 && y3 < y2 && y1 < y4) {
+    return true;
+  }
+
+
+
+  return false;
 }
+
 
 const main = () => {
   document.addEventListener("keydown", keyDown, true);
