@@ -1,14 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Paisaje 2D en WebGL 2.0</title>
   <style>
-    body { margin: 0; }
-    canvas { display: block; }
+    body {
+      margin: 0;
+    }
+
+    canvas {
+      display: block;
+    }
   </style>
 </head>
+
 <body>
   <canvas id="canvas" width="600" height="600"></canvas>
 
@@ -59,12 +66,12 @@
 
       gl.useProgram(programaID);
 
-      const drawShape = (vertices, color, mode) => {
-        const VAO = gl.createVertexArray();
-        gl.bindVertexArray(VAO);
+      const dibujar = (vertices, color, tipo) => {
+        const lineasVAO = gl.createVertexArray();
+        gl.bindVertexArray(lineasVAO);
 
-        const buffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+        const codigo = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, codigo);
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
 
         gl.enableVertexAttribArray(0);
@@ -73,12 +80,12 @@
         const uColor = gl.getUniformLocation(programaID, "uColor");
         gl.uniform4f(uColor, ...color);
 
-        gl.drawArrays(mode, 0, vertices.length / 2);
+        gl.drawArrays(tipo, 0, vertices.length / 2);
 
         gl.bindVertexArray(null);
       };
 
-      gl.clearColor(0.5, 0.8, 1.0, 1);  
+      gl.clearColor(0.5, 0.8, 1.0, 1);
       gl.clear(gl.COLOR_BUFFER_BIT);
 
       const campoVertices = [
@@ -87,28 +94,28 @@
         1.0, -1.0,
         -1.0, -1.0
       ];
-      drawShape(campoVertices, [0.2, 0.8, 0.2, 1], gl.TRIANGLE_FAN);
+      dibujar(campoVertices, [0.2, 0.8, 0.2, 1], gl.TRIANGLE_FAN);
 
       const montana1Vertices = [
         -1.0, -0.5,
         -0.6, 0.0,
         -0.2, -0.5
       ];
-      drawShape(montana1Vertices, [0.4, 0.3, 0.2, 1], gl.TRIANGLES);
+      dibujar(montana1Vertices, [0.4, 0.3, 0.2, 1], gl.TRIANGLES);
 
       const montana2Vertices = [
         -0.3, -0.5,
         0.2, 0.2,
         0.7, -0.5
       ];
-      drawShape(montana2Vertices, [0.5, 0.4, 0.3, 1], gl.TRIANGLES);
+      dibujar(montana2Vertices, [0.5, 0.4, 0.3, 1], gl.TRIANGLES);
 
       const montana3Vertices = [
         0.3, -0.5,
         0.8, 0.0,
         1.3, -0.5
       ];
-      drawShape(montana3Vertices, [0.6, 0.5, 0.4, 1], gl.TRIANGLES);
+      dibujar(montana3Vertices, [0.6, 0.5, 0.4, 1], gl.TRIANGLES);
 
       const drawCircle = (cx, cy, radius, numSegments, color) => {
         const circleVertices = [];
@@ -118,10 +125,10 @@
           const y = cy + radius * Math.sin(theta);
           circleVertices.push(x, y);
         }
-        drawShape(circleVertices, color, gl.TRIANGLE_FAN);
+        dibujar(circleVertices, color, gl.TRIANGLE_FAN);
       };
 
-      drawCircle(0.6, 0.7, 0.2, 50, [1.0, 1.0, 0.0, 1]);  
+      drawCircle(0.6, 0.7, 0.2, 50, [1.0, 1.0, 0.0, 1]);
 
       const casaVertices = [
         -0.2, -0.5,
@@ -129,14 +136,14 @@
         0.2, -0.1,
         -0.2, -0.1
       ];
-      drawShape(casaVertices, [0.6, 0.3, 0.2, 1], gl.TRIANGLE_FAN);
+      dibujar(casaVertices, [0.6, 0.3, 0.2, 1], gl.TRIANGLE_FAN);
 
       const techoVertices = [
         -0.25, -0.1,
         0.0, 0.2,
         0.25, -0.1
       ];
-      drawShape(techoVertices, [0.8, 0.0, 0.0, 1], gl.TRIANGLES);
+      dibujar(techoVertices, [0.8, 0.0, 0.0, 1], gl.TRIANGLES);
 
       const puertaVertices = [
         -0.05, -0.5,
@@ -144,7 +151,7 @@
         0.05, -0.3,
         -0.05, -0.3
       ];
-      drawShape(puertaVertices, [0.4, 0.2, 0.1, 1], gl.TRIANGLE_FAN);
+      dibujar(puertaVertices, [0.4, 0.2, 0.1, 1], gl.TRIANGLE_FAN);
 
       const ventanaVertices = [
         -0.15, -0.2,
@@ -152,10 +159,11 @@
         -0.05, -0.3,
         -0.15, -0.3
       ];
-      drawShape(ventanaVertices, [0.2, 0.6, 1.0, 1], gl.TRIANGLE_FAN);
+      dibujar(ventanaVertices, [0.2, 0.6, 1.0, 1], gl.TRIANGLE_FAN);
     };
 
     main();
   </script>
 </body>
+
 </html>

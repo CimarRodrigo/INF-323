@@ -54,27 +54,26 @@
         fragColor = uColor; // Blanco para líneas
       }
     </script>
-
-  <script id="vs-marcas" type="vertex">
-      #version 300 es
-      precision mediump float;
-      uniform mat4 uMatrizProyeccion;
-      uniform mat4 uMatrizVista;
-      uniform mat4 uMatrizModelo;
-      layout(location = 0) in vec2 aPos;
-      void main() {
-        gl_Position = uMatrizProyeccion * uMatrizVista * uMatrizModelo * vec4(aPos, 0.0, 1.0);
-      }
-    </script>
-  <script id="fs-marcas" type="fragment">
-      #version 300 es
-      precision mediump float;
-      uniform vec4 uColor;
-      out vec4 fragColor;
-      void main() {
-        fragColor = uColor;
-      }
-    </script>
+  <!--<script id="vs-marcas" type="vertex">-->
+  <!--#version 300 es-->
+  <!--precision mediump float;-->
+  <!--uniform mat4 uMatrizProyeccion;-->
+  <!--uniform mat4 uMatrizVista;-->
+  <!--uniform mat4 uMatrizModelo;-->
+  <!--layout(location = 0) in vec2 aPos;-->
+  <!--void main() {-->
+  <!--gl_Position = uMatrizProyeccion * uMatrizVista * uMatrizModelo * vec4(aPos, 0.0, 1.0);-->
+  <!--}-->
+  <!--</script>-->
+  <!--<script id="fs-marcas" type="fragment">-->
+  <!--#version 300 es-->
+  <!--precision mediump float;-->
+  <!--uniform vec4 uColor;-->
+  <!--out vec4 fragColor;-->
+  <!--void main() {-->
+  <!--fragColor = uColor;-->
+  <!--}-->
+  </script>
 
   <script>
     const identidad = (r) => {
@@ -123,9 +122,9 @@
     const fsSourceLineas = document.getElementById("fs-lineas").text.trim();
     const programaLineas = crearProgram(gl, vsSourceLineas, fsSourceLineas);
 
-    const vsSourceMarcas = document.getElementById("vs-marcas").text.trim();
-    const fsSourceMarcas = document.getElementById("fs-marcas").text.trim();
-    const programaMarcas = crearProgram(gl, vsSourceMarcas, fsSourceMarcas);
+    <!--const vsSourceMarcas = document.getElementById("vs-marcas").text.trim();-->
+    <!--const fsSourceMarcas = document.getElementById("fs-marcas").text.trim(); -->
+    <!--const programaMarcas = crearProgram(gl, vsSourceMarcas, fsSourceMarcas); -->
 
     const MatrizProyeccion = new Float32Array(16);
     const MatrizVista = new Float32Array(16);
@@ -182,19 +181,19 @@
     }
 
     function dibujarMarcas() {
-      gl.useProgram(programaMarcas);
+      <!--gl.useProgram(programaLineas);-->
 
-      const locProy = gl.getUniformLocation(programaMarcas, "uMatrizProyeccion");
-      const locVista = gl.getUniformLocation(programaMarcas, "uMatrizVista");
-      const locModelo = gl.getUniformLocation(programaMarcas, "uMatrizModelo");
-      const locColor = gl.getUniformLocation(programaMarcas, "uColor");
+      <!--const locProy = gl.getUniformLocation(programaLineas, "uMatrizProyeccion");-->
+      <!--const locVista = gl.getUniformLocation(programaLineas, "uMatrizVista");-->
+      <!--const locModelo = gl.getUniformLocation(programaLineas, "uMatrizModelo");-->
+      <!--const locColor = gl.getUniformLocation(programaLineas, "uColor");-->
 
-      gl.uniformMatrix4fv(locProy, false, MatrizProyeccion);
-      gl.uniformMatrix4fv(locVista, false, MatrizVista);
-      gl.uniformMatrix4fv(locModelo, false, MatrizModelo);
+      <!--gl.uniformMatrix4fv(locProy, false, MatrizProyeccion);-->
+      <!--gl.uniformMatrix4fv(locVista, false, MatrizVista);-->
+      <!--gl.uniformMatrix4fv(locModelo, false, MatrizModelo);-->
 
       gl.bindVertexArray(marcasVAO);
-      gl.bindBuffer(gl.ARRAY_BUFFER, codigoMarcas);
+      gl.bindBuffer(gl.ARRAY_BUFFER, codigoLineas);
 
       tablero.forEach((fila, i) => {
         fila.forEach((celda, j) => {
@@ -239,21 +238,22 @@
       });
 
       gl.bindVertexArray(null);
+
       gl.bindBuffer(gl.ARRAY_BUFFER, null);
     }
 
     // Función para dibujar las líneas del tablero
     function dibujarLineas() {
-      gl.useProgram(programaLineas);
+      <!--gl.useProgram(programaLineas);-->
 
-      const locProy = gl.getUniformLocation(programaLineas, "uMatrizProyeccion");
-      const locVista = gl.getUniformLocation(programaLineas, "uMatrizVista");
-      const locModelo = gl.getUniformLocation(programaLineas, "uMatrizModelo");
-      const locColor = gl.getUniformLocation(programaLineas, "uColor");
+      <!--const locProy = gl.getUniformLocation(programaLineas, "uMatrizProyeccion");-->
+      <!--const locVista = gl.getUniformLocation(programaLineas, "uMatrizVista");-->
+      <!--const locModelo = gl.getUniformLocation(programaLineas, "uMatrizModelo");-->
+      <!--const locColor = gl.getUniformLocation(programaLineas, "uColor");-->
 
-      gl.uniformMatrix4fv(locProy, false, MatrizProyeccion);
-      gl.uniformMatrix4fv(locVista, false, MatrizVista);
-      gl.uniformMatrix4fv(locModelo, false, MatrizModelo);
+      <!--gl.uniformMatrix4fv(locProy, false, MatrizProyeccion);-->
+      <!--gl.uniformMatrix4fv(locVista, false, MatrizVista);-->
+      <!--gl.uniformMatrix4fv(locModelo, false, MatrizModelo);-->
 
       gl.uniform4f(locColor, 1.0, 1.0, 1.0, 1.0);
 
@@ -264,7 +264,7 @@
 
     function dibuja() {
       gl.clearColor(0, 0, 0, 1);
-      gl.clear(gl.COLOR_BUFFER_BIT);
+      <!--gl.clear(gl.COLOR_BUFFER_BIT);-->
 
       dibujarMarcas();
 
@@ -326,6 +326,16 @@
 
     function main() {
       gl.viewport(0, 0, canvas.width, canvas.height);
+      gl.useProgram(programaLineas);
+
+      const locProy = gl.getUniformLocation(programaLineas, "uMatrizProyeccion");
+      const locVista = gl.getUniformLocation(programaLineas, "uMatrizVista");
+      const locModelo = gl.getUniformLocation(programaLineas, "uMatrizModelo");
+      const locColor = gl.getUniformLocation(programaLineas, "uColor");
+
+      gl.uniformMatrix4fv(locProy, false, MatrizProyeccion);
+      gl.uniformMatrix4fv(locVista, false, MatrizVista);
+      gl.uniformMatrix4fv(locModelo, false, MatrizModelo);
       dibuja();
 
       canvas.addEventListener("mousedown", mouseDown, false);

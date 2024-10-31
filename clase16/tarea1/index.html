@@ -1,0 +1,49 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+  <title>Textura 2D en WebGL 2.0</title>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <link href="./style.css" rel="stylesheet">
+  <script type="module" src="./script.js" defer></script>
+</head>
+
+<body>
+  <canvas id="webglcanvas"></canvas>
+  <img src="./rojo.png" id="imagenTextura1" hidden />
+  <img src="./pueblo_paleta.png" id="imagenTextura2" hidden>
+  <img src="./pikachu.png" id="imagenTextura3" hidden>
+
+
+  <script id="vs" type="vertex">
+        #version 300 es
+        precision mediump float;
+        uniform mat4 uMatrizProyeccion;
+        uniform mat4 uMatrizVista;
+        uniform mat4 uMatrizModelo;
+        uniform mat4 uMatrizTextura;
+
+        layout(location = 0) in vec2 aVertices;
+        layout(location = 1) in vec2 aCoordenadasDeTextura;
+        out vec2 vCoordenadasDeTextura;
+        void main() {
+            vCoordenadasDeTextura = (uMatrizTextura * vec4(aCoordenadasDeTextura, 0.0, 1.0)).xy;
+            gl_Position = uMatrizProyeccion * uMatrizVista * uMatrizModelo * vec4(aVertices, 0.0, 1.0);
+        }
+  </script>
+
+  <script id="fs" type="fragment">
+        #version 300 es
+        precision mediump float;
+        uniform sampler2D uUnidadDeTextura;
+        in vec2 vCoordenadasDeTextura;
+        out vec4 color;
+        void main() {
+            color = texture(uUnidadDeTextura, vCoordenadasDeTextura); 
+        }
+   </script>
+
+
+</body>
+
+</html>
