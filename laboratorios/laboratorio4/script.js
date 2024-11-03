@@ -12,6 +12,9 @@ let codigoDeTextura2;
 let textura3;
 let codigoDeTextura3;
 
+let textura4;
+let codigoDeTextura4;
+
 let uMatrizProyeccion;
 let uMatrizVista;
 let uMatrizModelo;
@@ -25,6 +28,8 @@ let MatrizVista = new Array(16);
 let MatrizModelo = new Array(16);
 let MatrizTextura = new Array(16);
 
+let colision = false;
+let estaAbierto = false;
 
 
 const compilaEnlazaLosShaders = () => {
@@ -66,14 +71,6 @@ class Rectangulo {
    */
   constructor(gl, x1 = -2, y1 = -2, x2 = 2, y2 = 2, u1 = 0, v1 = 0, u2 = 1, v2 = 1, posX = 0, posY = 0) {
 
-    /* Coordenadas cartesianas (x, y) */
-    //let vertices = [
-    //-2, -2, // 0
-    //2, -2, // 1
-    //2, 2, // 2
-    //-2, 2, // 3
-    //];
-
     let vertices = [
       x1, y1, // 0,
       x2, y1, // 1,
@@ -81,19 +78,6 @@ class Rectangulo {
       x1, y2, // 3,
     ];
 
-    /* Coordenadas de textura (u, v) */
-    //let coord_textura = [
-    //0, 0, // 0
-    //2, 0, // 1
-    //2, 2, // 2
-    //0, 2, // 3
-    //];
-    //let coord_textura = [
-    //0, 3 / 4, // 0
-    //1 / 4, 3 / 4, // 1
-    //1 / 4, 1, // 2
-    //0, 1, // 3
-    //];
 
     let coord_textura = [
       u1, v1, // 0,
@@ -108,6 +92,10 @@ class Rectangulo {
     this.ctx = 0;
     this.cty = 1;
     this.coord_textura = coord_textura;
+    this.tamX = x2;
+    this.tamY = y2;
+
+
 
 
     gl.bindVertexArray(this.rectanguloVAO);
@@ -151,25 +139,43 @@ class Rectangulo {
 }
 
 const keyDown = (event) => {
+  document.body.addEventListener("keydown", (e) => {
+    const audio = document.getElementById("audio");
+    audio.play();
+  });
+
+
   if (event.key == "ArrowRight") {
     textura1.posX += 0.1;
     textura1.ctx += 1 / 4;
     textura1.cty = 2 / 4;
+    if (estaColisionando(textura1, textura4)) {
+      textura1.posX -= 0.1;
+    }
   }
   if (event.key == "ArrowLeft") {
     textura1.posX -= 0.1;
     textura1.ctx += 1 / 4;
     textura1.cty = 3 / 4;
+    if (estaColisionando(textura1, textura4)) {
+      textura1.posX += 0.1;
+    }
   }
   if (event.key == "ArrowUp") {
     textura1.posY += 0.1;
     textura1.ctx += 1 / 4;
     textura1.cty = 1 / 4;
+    if (estaColisionando(textura1, textura4)) {
+      textura1.posY -= 0.1;
+    }
   }
   if (event.key == "ArrowDown") {
     textura1.posY -= 0.1;
     textura1.ctx += 1 / 4;
     textura1.cty = 1
+    if (estaColisionando(textura1, textura4)) {
+      textura1.posY += 0.1;
+    }
   }
 }
 
@@ -191,15 +197,34 @@ const dibuja = (textura, codigoDeTextura, tras = false, trasTex = false, posTexX
   textura.muestra(gl);
 
   if (esSprite && tiempoCompletado) {
-
     textura.actualizaAnimacion();
+  }
+}
 
+const estaColisionando = (rectangulo1, rectangulo2) => {
+  let x1 = rectangulo1.posX - rectangulo1.tamX / 2;
+  let x2 = rectangulo1.posX + rectangulo1.tamX / 2;
+  let x3 = rectangulo2.posX - rectangulo2.tamX / 2;
+  let x4 = rectangulo2.posX + rectangulo2.tamX / 2;
+
+  let y1 = rectangulo1.posY - rectangulo1.tamY / 2;
+  let y2 = rectangulo1.posY + rectangulo1.tamY / 2;
+  let y3 = rectangulo2.posY - rectangulo2.tamY / 2;
+  let y4 = rectangulo2.posY + rectangulo2.tamY / 2;
+
+  if (x3 < x2 && x1 < x4 && y3 < y2 && y1 < y4) {
+    colision = true;
+    if (!estaAbierto) {
+      let audio = document.getElementById("pokebola_sonido");
+      audio.play();
+    }
+    estaAbierto = true;
+    return true;
 
   }
 
-
+  return false;
 }
-
 
 const leeLaTextura = (gl, ID_del_archivo, codigoDeTextura) => {
 
@@ -222,9 +247,15 @@ const leeLaTextura = (gl, ID_del_archivo, codigoDeTextura) => {
 const dibujaEscena = () => {
   //gl.clear(gl.COLOR_BUFFER_BIT);
 
-  dibuja(textura2, codigoDeTextura2, false, 0, 0, false, 0, 0, false);
-  //dibuja(textura3, codigoDeTextura3, true, true, 0, 0, true, true);
-  dibuja(textura1, codigoDeTextura1, true, true, 0, 0, true, true);
+  if (colision) {
+    dibuja(textura2, codigoDeTextura2, false, 0, 0, false, 0, 0, false);
+    dibuja(textura1, codigoDeTextura1, true, true, 0, 0, true, true);
+    dibuja(textura3, codigoDeTextura3, true, true, 0, 0, true, true);
+  } else {
+    dibuja(textura2, codigoDeTextura2, false, 0, 0, false, 0, 0, false);
+    dibuja(textura1, codigoDeTextura1, true, true, 0, 0, true, true);
+    dibuja(textura4, codigoDeTextura4, true, true, 0, 0, true, false);
+  }
 
 
   requestAnimationFrame(dibujaEscena);
@@ -242,17 +273,21 @@ const main = () => {
   gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
   compilaEnlazaLosShaders();
 
-  textura1 = new Rectangulo(gl, -0.8, -0.8, 0.8, 0.8, 0, 3 / 4, 1 / 4, 1, -0.2, 0);
+  textura1 = new Rectangulo(gl, -0.8, -0.8, 0.8, 0.8, 0, 3 / 4, 1 / 4, 1, -0.2, -2);
   codigoDeTextura1 = gl.createTexture();
-  leeLaTextura(gl, "imagenTextura1", codigoDeTextura1);
+  leeLaTextura(gl, "rojo", codigoDeTextura1);
 
   textura2 = new Rectangulo(gl, -5, -5, 5, 5);
   codigoDeTextura2 = gl.createTexture();
-  leeLaTextura(gl, "imagenTextura2", codigoDeTextura2);
+  leeLaTextura(gl, "fondo", codigoDeTextura2);
 
   textura3 = new Rectangulo(gl, -0.7, -0.7, 0.7, 0.7, 0, 3 / 4, 1 / 4, 1, -0.2, 1.2);
   codigoDeTextura3 = gl.createTexture();
-  leeLaTextura(gl, "imagenTextura3", codigoDeTextura3);
+  leeLaTextura(gl, "pikachu", codigoDeTextura3);
+
+  textura4 = new Rectangulo(gl, -0.3, -0.3, 0.3, 0.3, 0, 0, 1, 1, -0.2, 1.2);
+  codigoDeTextura4 = gl.createTexture();
+  leeLaTextura(gl, "pokebola", codigoDeTextura4);
 
 
   gl.useProgram(programaID);

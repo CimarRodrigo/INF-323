@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title></title>
+</head>
+
+<body>
+
+  <audio autoplay id="audio">
+    <source src="./sonido.mp3" type="audio/mp3">
+    no se puede reproducir el audio
+  </audio>
+
+
+  <script>
+    window.addEventListener('load', () => {
+      const audio = document.getElementById('audio');
+      audio.play().catch(error => {
+        console.log('El navegador bloqueó la reproducción automática:', error);
+      });
+    });
+  </script>
+</body>
+
+</html>

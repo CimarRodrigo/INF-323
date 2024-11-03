@@ -10,9 +10,10 @@
 
 <body>
   <canvas id="webglcanvas"></canvas>
-  <img src="./rojo.png" id="imagenTextura1" hidden />
-  <img src="./pueblo_paleta.png" id="imagenTextura2" hidden>
-  <img src="./pikachu.png" id="imagenTextura3" hidden>
+  <img src="./rojo.png" id="rojo" hidden />
+  <img src="./pueblo_paleta.png" id="fondo" hidden>
+  <img src="./pikachu.png" id="pikachu" hidden>
+  <img src="./pokebola.png" id="pokebola" hidden>
 
 
   <script id="vs" type="vertex">
@@ -43,6 +44,13 @@
         }
    </script>
 
+  <audio id="audio" autoplay loop>
+    <source src="./sonido.mp3" type="audio/mp3">
+  </audio>
+
+  <audio id="pokebola_sonido">
+    <source src="./pokeball_sound.mp3" type="audio/mp3">
+  </audio>
 
 </body>
 
