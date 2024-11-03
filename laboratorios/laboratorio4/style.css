@@ -1,0 +1,22 @@
+
+h2 {
+  color: blue;
+  font-family: 'Helvetica Neue', sans-serif;
+  font-size: 24px;
+  font-weight: bold;
+  letter-spacing: -1px;
+  line-height: 1;
+  text-align: center;
+}
+
+body, html {
+  margin: 0;
+  padding: 0;
+  overflow: hidden; /* Evita barras de desplazamiento */
+}
+
+canvas {
+  display: block; /* Elimina espacios entre líneas en algunos navegadores */
+  width: 100vw;
+  height: 100vh;
+}

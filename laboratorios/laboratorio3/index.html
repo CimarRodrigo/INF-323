@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title></title>
+    <style>
+        canvas {
+    border: 1px solid black;
+    background-color: white;
+    width: 500px;
+    height: 500px;
+    margin: 0 auto;
+    display: block;
+  }
+    </style>
+  </head>
+  <body>
+
+    <canvas id="canvas"></canvas>
+    <script id = "vs" type = "vertex">
+      #version 300 es
+      uniform mat4 uMatrizProyeccion;
+      uniform mat4 uMatrizVista;
+      uniform mat4 uMatrizModelo;
+      precision mediump float;
+      layout(location = 0) in vec2 aVertices;
+      void main() {
+        gl_Position = uMatrizProyeccion * uMatrizVista * uMatrizModelo * vec4(aVertices, 0.0, 1.0);
+      }
+    </script>
+    <script id = "fs" type = "fragment">
+      #version 300 es
+      precision mediump float;
+      uniform vec4 uColor;
+      out vec4 color;
+      void main() {
+        color = uColor;
+      }
+    </script>
+
+    <script>
+        const multiplica = (c, a, b) => {
+  let r = new Array(16);
+  let i, j, k;
+  for (i = 0; i < 4; i++) {
+    for (j = 0; j < 4; j++) {
+      let s = 0;
+      for (k = 0; k < 4; k++)
+        s = s + a[i + k * 4] * b[k + j * 4];
+      r[i + j * 4] = s;
+    }
+  }
+  for (i = 0; i < 16; i++)
+    c[i] = r[i];
+}
+         const identidad = (r) => {
+  r[0] = 1; r[4] = 0; r[8] = 0; r[12] = 0;
+  r[1] = 0; r[5] = 1; r[9] = 0; r[13] = 0;
+  r[2] = 0; r[6] = 0; r[10] = 1; r[14] = 0;
+  r[3] = 0; r[7] = 0; r[11] = 0; r[15] = 1;
+}
+
+ const traslacion = (matriz, tx, ty, tz) => {
+  var r = new Array(16);
+  r[0] = 1; r[4] = 0; r[8] = 0; r[12] = tx;
+  r[1] = 0; r[5] = 1; r[9] = 0; r[13] = ty;
+  r[2] = 0; r[6] = 0; r[10] = 1; r[14] = tz;
+  r[3] = 0; r[7] = 0; r[11] = 0; r[15] = 1;
+  multiplica(matriz, matriz, r);
+}
+const ortho = (r, izq, der, abj, arr, cerca, lejos) => {
+  r[0] = 2 / (der - izq); r[4] = 0; r[8] = 0; r[12] = -(der + izq) / (der - izq);
+  r[1] = 0; r[5] = 2 / (arr - abj); r[9] = 0; r[13] = -(arr + abj) / (arr - abj);
+  r[2] = 0; r[6] = 0; r[10] = -2 / (lejos - cerca); r[14] = -(lejos + cerca) / (lejos - cerca);
+  r[3] = 0; r[7] = 0; r[11] = 0; r[15] = 1;
+}
+        let uMatrizProyeccion;
+let uMatrizModelo;
+let uMatrizVista;
+let uColor;
+
+let MatrizProyeccion = new Array(16);
+let MatrizModelo = new Array(16);
+let MatrizVista = new Array(16);
+
+const canvas = document.getElementById("canvas");
+let gl = canvas.getContext("webgl2");
+let rectanguloVAO;
+
+let snake = [{ x: 0, y: 0 }]; // Posición inicial de la serpiente
+let food = { x: Math.floor(Math.random() * 10 - 5), y: Math.floor(Math.random() * 10 - 5) }; // Posición inicial de la comida
+let direction = { x: 1, y: 0 }; // Dirección inicial hacia la derecha
+let velocidad = 300; // Controla la velocidad de la serpiente (más grande = más lento)
+let jugando = true; // Controla el estado del juego (si está corriendo o no)
+
+// Creación del rectángulo para la serpiente y comida
+const rectangulo = () => {
+    let vertices = [
+        -0.5, -0.5,
+        0.5, -0.5,
+        0.5, 0.5,
+        -0.5, 0.5,
+    ];
+
+    rectanguloVAO = gl.createVertexArray();
+    gl.bindVertexArray(rectanguloVAO);
+    let codigoVertices = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, codigoVertices);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+    gl.enableVertexAttribArray(0);
+    gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
+
+    gl.bindVertexArray(null);
+    gl.bindBuffer(gl.ARRAY_BUFFER, null);
+};
+
+// Dibuja un rectángulo en la posición (x, y) con el color especificado
+const dibujarRectangulo = (x, y, color) => {
+    identidad(MatrizModelo);
+    traslacion(MatrizModelo, x, y, 0);
+    gl.uniformMatrix4fv(uMatrizModelo, false, MatrizModelo);
+    gl.uniform4f(uColor, color[0], color[1], color[2], 1);
+    gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
+};
+
+// Función que dibuja la serpiente y la comida
+const dibujar = () => {
+    gl.clearColor(0, 0, 0, 1);
+    gl.clear(gl.COLOR_BUFFER_BIT);
+
+    gl.bindVertexArray(rectanguloVAO);
+
+    // Dibujar la serpiente
+    snake.forEach(segment => {
+        dibujarRectangulo(segment.x, segment.y, [0, 1, 0]); // Verde para la serpiente
+    });
+
+    // Dibujar la comida
+    dibujarRectangulo(food.x, food.y, [1, 0, 0]); // Rojo para la comida
+
+    gl.bindVertexArray(null);
+};
+
+// Actualiza la posición de la serpiente y maneja colisiones
+const actualizar = () => {
+    if (!jugando) return; // Si el juego no está activo, no actualizamos
+
+    // Mover la cabeza de la serpiente
+    const nuevaCabeza = { x: snake[0].x + direction.x, y: snake[0].y + direction.y };
+
+    // Verificar colisión con los bordes
+    if (nuevaCabeza.x < -5 || nuevaCabeza.x > 5 || nuevaCabeza.y < -5 || nuevaCabeza.y > 5) {
+        perder();
+        return;
+    }
+
+    // Verificar colisión con la comida
+    if (nuevaCabeza.x === food.x && nuevaCabeza.y === food.y) {
+        // Mover la comida a una nueva posición aleatoria
+        food = { x: Math.floor(Math.random() * 10 - 5), y: Math.floor(Math.random() * 10 - 5) };
+    } else {
+        // Quitar el último segmento de la serpiente si no comió
+        snake.pop();
+    }
+
+    // Verificar colisión con el propio cuerpo
+    for (let i = 0; i < snake.length; i++) {
+        if (snake[i].x === nuevaCabeza.x && snake[i].y === nuevaCabeza.y) {
+            perder();
+            return;
+        }
+    }
+
+    // Agregar la nueva cabeza al principio de la serpiente
+    snake.unshift(nuevaCabeza);
+    dibujar();
+};
+
+// Función para manejar la pérdida del juego
+const perder = () => {
+    alert('¡Juego terminado! Reiniciando...');
+    jugando = false; // Pausar el juego
+    setTimeout(() => {
+        snake = [{ x: 0, y: 0 }]; // Reiniciar la serpiente
+        direction = { x: 1, y: 0 }; // Reiniciar la dirección
+        food = { x: Math.floor(Math.random() * 10 - 5), y: Math.floor(Math.random() * 10 - 5) };
+        jugando = true; // Reactivar el juego
+    }, 1000); // Esperar 1 segundo antes de reiniciar
+};
+
+// Controlar la dirección con el teclado
+const keyDown = (event) => {
+    switch (event.key) {
+        case "ArrowUp":
+            if (direction.y === 0) direction = { x: 0, y: 1 }; // Mover arriba
+            break;
+        case "ArrowDown":
+            if (direction.y === 0) direction = { x: 0, y: -1 }; // Mover abajo
+            break;
+        case "ArrowLeft":
+            if (direction.x === 0) direction = { x: -1, y: 0 }; // Mover izquierda
+            break;
+        case "ArrowRight":
+            if (direction.x === 0) direction = { x: 1, y: 0 }; // Mover derecha
+            break;
+    }
+};
+
+// Ciclo principal del juego
+const cicloJuego = () => {
+    if (jugando) {
+        actualizar(); // Actualiza la serpiente
+    }
+    setTimeout(cicloJuego, velocidad); // Hacer que el juego corra más lento
+};
+
+// Función principal que inicia todo
+const main = () => {
+    document.addEventListener("keydown", keyDown, true);
+    gl.viewport(0, 0, canvas.width, canvas.height);
+
+    let shaderVertice = gl.createShader(gl.VERTEX_SHADER);
+    gl.shaderSource(shaderVertice, document.getElementById("vs").text.trim());
+    gl.compileShader(shaderVertice);
+
+    let shaderFragmento = gl.createShader(gl.FRAGMENT_SHADER);
+    gl.shaderSource(shaderFragmento, document.getElementById("fs").text.trim());
+    gl.compileShader(shaderFragmento);
+
+    let programaID = gl.createProgram();
+    gl.attachShader(programaID, shaderVertice);
+    gl.attachShader(programaID, shaderFragmento);
+    gl.linkProgram(programaID);
+
+    rectangulo();
+
+    gl.useProgram(programaID);
+
+    uMatrizProyeccion = gl.getUniformLocation(programaID, "uMatrizProyeccion");
+    uMatrizModelo = gl.getUniformLocation(programaID, "uMatrizModelo");
+    uMatrizVista = gl.getUniformLocation(programaID, "uMatrizVista");
+    uColor = gl.getUniformLocation(programaID, "uColor");
+
+    identidad(MatrizProyeccion);
+    ortho(MatrizProyeccion, -5, 5, -5, 5, -1, 1);
+    gl.uniformMatrix4fv(uMatrizProyeccion, false, MatrizProyeccion);
+
+    identidad(MatrizVista);
+    gl.uniformMatrix4fv(uMatrizVista, false, MatrizVista);
+
+    gl.clearColor(0, 0, 0, 1);
+    gl.clear(gl.COLOR_BUFFER_BIT);
+
+    cicloJuego(); // Iniciar el ciclo del juego
+};
+
+main();
+
+    </script>
+  </body>
+</html>
