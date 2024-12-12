@@ -1,0 +1,49 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+  <title>Textura sobre un Cubo en WebGL 2.0</title>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <link ref="stylesheet" href="./style.css">
+</head>
+
+<body>
+  <canvas id="webglcanvas" style="border: none;" width="500" height="500"></canvas>
+  <img src="marron.png" id="imagenTextura" hidden />
+  <script src="./script.js" type="module" defer>
+
+  </script>
+  <!--
+        /***************************************************************************/
+        /* Se definen los códigos shaders.                                         */
+        /***************************************************************************/
+      -->
+  <script id="vs" type="vertex">
+        #version 300 es
+        precision mediump float;
+        uniform mat4 uMatrizProyeccion;
+        uniform mat4 uMatrizVista;
+        uniform mat4 uMatrizModelo;
+        layout(location = 0) in vec3 aVertices;
+        layout(location = 1) in vec2 aCoordenadasDeTextura;
+        out vec2 vCoordenadasDeTextura;
+        void main() {
+            vCoordenadasDeTextura = aCoordenadasDeTextura;  
+            gl_Position = uMatrizProyeccion * uMatrizVista * uMatrizModelo * vec4(aVertices, 1.0);
+        }
+      </script>
+
+  <script id="fs" type="fragment">
+        #version 300 es
+        precision mediump float;
+        uniform sampler2D uUnidadDeTextura;
+        in vec2 vCoordenadasDeTextura;
+        out vec4 color;
+        void main() {
+            color = texture(uUnidadDeTextura, vCoordenadasDeTextura); 
+        }
+  </script>
+
+</body>
+
+</html>

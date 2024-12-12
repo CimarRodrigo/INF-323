@@ -1,0 +1,63 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+  <title>Proyecciones (con Interacción) en WebGL 2.0</title>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <script type="module" src="./script.js" defer>
+
+  </script>
+</head>
+
+<body>
+  <div id="content">
+    <h2 id="headline">Proyecciones (con Interacción) en WebGL 2.0</h2>
+    <noscript>
+      <p><b>Lo siento, pero ésta página requiere JavaScript.</b></p>
+    </noscript>
+    <div id="tools">
+      <h3>Elija una opción:</h3>
+      <div id="opciones">
+        <input type="radio" id="opcion1" name="proyeccion" value="proyeccion1" checked="checked"> Proyección en
+        Perspectiva<br>
+        <input type="radio" id="opcion2" name="proyeccion" value="proyeccion2"> Proyección en Perspectiva (frustum)<br>
+        <input type="radio" id="opcion3" name="proyeccion" value="proyeccion3"> Proyección Paralela
+      </div>
+      <p><button id="reset">Reinicia</button></p>
+    </div>
+    <div id="canvas-holder">
+      <canvas id="webglcanvas" style="border: none;" width="800" height="500"></canvas>
+    </div>
+  </div>
+  <!--
+        /***************************************************************************/
+        /* Se definen los códigos shaders.                                         */
+        /***************************************************************************/
+      -->
+  <script id="vs" type="vertex">
+        #version 300 es
+        uniform mat4 uMatrizProyeccion;
+        uniform mat4 uMatrizVista;
+        uniform mat4 uMatrizModelo;
+        layout(location = 0) in vec3 aVertices;
+        layout(location = 1) in vec4 aColores;
+        out vec4 vColores;
+        void main() {
+          vColores = aColores;  
+          gl_Position = uMatrizProyeccion * uMatrizVista * uMatrizModelo * vec4(aVertices, 1.0);
+        }
+      </script>
+
+  <script id="fs" type="fragment">
+        #version 300 es
+        precision highp float;
+        in vec4 vColores;
+        out vec4 color;
+        void main() {
+            color = vColores;
+        }
+      </script>
+
+</body>
+
+</html>

@@ -100,28 +100,28 @@ class Rombo {
     /* Índices combinados para las caras y líneas de los bordes del rombo */
     let indices = [
       // Caras del rombo
-      0, 1, 2,  // Cara frontal superior
-      1, 4, 2,  // Cara derecha superior
-      4, 3, 2,  // Cara trasera superior
-      3, 0, 2,  // Cara izquierda superior
-      0, 1, 5,  // Cara frontal inferior
-      1, 4, 5,  // Cara derecha inferior
-      4, 3, 5,  // Cara trasera inferior
-      3, 0, 5,  // Cara izquierda inferior
+      0, 1, 1, 2, 2, 0,  // Cara frontal superior
+      1, 4, 4, 2, 2, 1, // Cara derecha superior
+      4, 3, 3, 2, 2, 4,// Cara trasera superior
+      3, 0, 0, 2, 2, 3,  // Cara izquierda superior
+      0, 1, 1, 5, 5, 0,  // Cara frontal inferior
+      1, 4, 4, 5, 5, 1, // Cara derecha inferior
+      4, 3, 3, 5, 5, 4,  // Cara trasera inferior
+      3, 0, 0, 5, 5, 3 // Cara izquierda inferior
 
       // Líneas de los bordes del rombo
-      0, 1,  // Línea entre vértice 0 y 1
-      1, 4,  // Línea entre vértice 1 y 4
-      4, 3,  // Línea entre vértice 4 y 3
-      3, 0,  // Línea entre vértice 3 y 0
-      0, 2,  // Línea entre vértice 0 y 2
-      1, 2,  // Línea entre vértice 1 y 2
-      4, 2,  // Línea entre vértice 4 y 2
-      3, 2,  // Línea entre vértice 3 y 2
-      0, 5,  // Línea entre vértice 0 y 5
-      1, 5,  // Línea entre vértice 1 y 5
-      4, 5,  // Línea entre vértice 4 y 5
-      3, 5   // Línea entre vértice 3 y 5
+      //0, 1,  // Línea entre vértice 0 y 1
+      //1, 4,  // Línea entre vértice 1 y 4
+      //4, 3,  // Línea entre vértice 4 y 3
+      //3, 0,  // Línea entre vértice 3 y 0
+      //0, 2,  // Línea entre vértice 0 y 2
+      //1, 2,  // Línea entre vértice 1 y 2
+      //4, 2,  // Línea entre vértice 4 y 2
+      //3, 2,  // Línea entre vértice 3 y 2
+      //0, 5,  // Línea entre vértice 0 y 5
+      //1, 5,  // Línea entre vértice 1 y 5
+      //4, 5,  // Línea entre vértice 4 y 5
+      //3, 5   // Línea entre vértice 3 y 5
     ];
 
     /* Se crea el objeto del arreglo de vértices (VAO) */

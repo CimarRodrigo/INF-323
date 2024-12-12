@@ -1,0 +1,19 @@
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0px;
+      border: 0;
+      overflow: hidden;
+      /* Deshabilita las barras de desplazamiento */
+      display: block;
+      /* Sin contenido flotantes a los lados */
+    }
+
+    #gui {
+      position: absolute;
+      /* Posición absoluta con relación a la ventana gráfica */
+      top: 0;
+      left: 0; 
+    }

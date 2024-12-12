@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Proyecto</title>
+  <link rel="stylesheet" href="./style.css">
+  <img src="marron.png" id="imagenTextura" hidden />
+  <img src="arbol_cortado.png" id="imagenTextura2" hidden />
+  <img src="panhd.png" id="imagenTextura3" hidden />
+  <img src="rama.png" id="imagenTextura4" hidden />
+
+  <script type="module" src="./script.js"></script>
+</head>
+
+<body>
+
+  <aside>
+    <h2>Proyecto</h2>
+    <div class="nombre">Nombre: Cimar Rodrigo Morales</div>
+    <div class="menu">Opciones de Textura</div>
+    <div class="submenu">
+      <a id="delfin">Tronco cortado</a>
+      <a id="cafe">Tronco viejo</a>
+      <a id="balon">Pan</a>
+      <a id="tabla">Rama</a>
+    </div>
+    <select id="opciones">
+      <option value="Triangles" selected> Dibujo </option>
+      <option value="Lines"> Lineas </option>
+    </select>
+  </aside>
+
+
+  <main>
+    <canvas id="webglcanvas" style="border: none;" width="1920" height="1080"></canvas>
+    <button id="color">Cambiar Fondo</button>
+  </main>
+
+  <script id="vs" type="vertex">
+        #version 300 es
+        precision mediump float;
+        uniform mat4 uMatrizProyeccion;
+        uniform mat4 uMatrizVista;
+        uniform mat4 uMatrizModelo;
+        layout(location = 0) in vec3 aVertices;
+        layout(location = 1) in vec2 aCoordenadasDeTextura;
+        out vec2 vCoordenadasDeTextura;
+        void main() {
+            vCoordenadasDeTextura = aCoordenadasDeTextura;  
+            gl_Position = uMatrizProyeccion * uMatrizVista * uMatrizModelo * vec4(aVertices, 1.0);
+        }
+      </script>
+
+  <script id="fs" type="fragment">
+        #version 300 es
+        precision mediump float;
+        uniform sampler2D uUnidadDeTextura;
+        in vec2 vCoordenadasDeTextura;
+        out vec4 color;
+        void main() {
+            color = texture(uUnidadDeTextura, vCoordenadasDeTextura); 
+        }
+  </script>
+  <script>
+    const menu = document.querySelector('.menu');
+    const submenu = document.querySelector('.submenu');
+
+    menu.addEventListener('click', () => {
+      menu.classList.toggle('active');
+    });
+  </script>
+
+</body>
+
+</html>

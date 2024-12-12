@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Proyecto</title>
+  <link rel="stylesheet" href="./style.css">
+  <script type="module" src="./script.js"></script>
+</head>
+
+<body>
+
+  <aside>
+    <h2>Proyecto</h2>
+    <div class="nombre">Nombre: Cimar Rodrigo Morales</div>
+    <div class="menu">Opciones de Textura</div>
+    <div class="submenu">
+      <a id="delfin">Delfines</a>
+      <a id="cafe">Taza de café</a>
+      <a id="balon">Balón</a>
+      <a id="tabla">Mesa</a>
+      <a id="flor">Flor</a>
+    </div>
+    <select id="opciones">
+      <option value="Triangles" selected> Dibujo </option>
+      <option value="Lines"> Lineas </option>
+    </select>
+  </aside>
+
+
+  <main>
+    <canvas id="webglcanvas" style="border: none;" width="500" height="500"></canvas>
+    <button id="color">Cambiar Fondo</button>
+  </main>
+
+  <script id="vs" type="vertex">
+        #version 300 es
+        uniform mat4 uMatrizProyeccion;
+        uniform mat4 uMatrizVista;        
+        uniform mat4 uMatrizModelo;
+        layout(location = 0) in vec3 aVertices;
+        void main() {
+          gl_Position = uMatrizProyeccion * uMatrizVista * uMatrizModelo * vec4(aVertices, 1.0);
+        }
+  </script>
+
+  <script id="fs" type="fragment">
+        #version 300 es
+        precision highp float;
+        uniform vec4 uColor;
+        out vec4 color;
+        void main() {
+            color = uColor;
+        }
+  </script>
+  <script>
+    const menu = document.querySelector('.menu');
+    const submenu = document.querySelector('.submenu');
+
+    menu.addEventListener('click', () => {
+      menu.classList.toggle('active');
+    });
+  </script>
+
+</body>
+
+</html>
